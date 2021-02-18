@@ -4,6 +4,7 @@ import { useState } from 'react';
 import List from '@material-ui/core/List';
 
 import GroceryListItem from './GroceryListItem';
+import NewItemForm from './NewItemForm';
 
 export default function GroceryList() {
   const [items, setItems] = useState([
@@ -28,10 +29,16 @@ export default function GroceryList() {
     };
   }
 
-  return (
+  const addItem = (item) => {
+    setItems([...items, item]);
+  };
+
+  return (<>
+    <NewItemForm addItem={addItem} />
     <List>
       {
         items.map((item, index) => <GroceryListItem
+          key={index}
           name={item.name}
           category={item.category}
           done={item.done}
@@ -40,5 +47,5 @@ export default function GroceryList() {
         />)
       }
     </List>
-  );
+  </>);
 }
