@@ -6,23 +6,39 @@ import List from '@material-ui/core/List';
 import GroceryListItem from './GroceryListItem';
 
 export default function GroceryList() {
-  const [itemStatuses, setItemStatuses] = useState([false]);
+  const [items, setItems] = useState([
+    {
+      name: 'Apples',
+      category: 'Produce',
+      done: false,
+    },
+  ]);
 
   const makeToggleDone = (index) => {
     return (e) => {
       e.preventDefault();
-      setItemStatuses(itemStatuses.map((status, i) => i === index ? !status : status));
+      setItems(items.map((item, i) => i === index ? { name: item.name, category: item.category, done: !item.done }: item ));
+    };
+  }
+
+  const makeDeleteSelf = (index) => {
+    return (e) => {
+      e.preventDefault();
+      setItems(items.filter((item, i) => i !== index));
     };
   }
 
   return (
     <List>
-      <GroceryListItem
-        name="Apples"
-        category="Produce"
-        done={itemStatuses[0]}
-        toggleDone={makeToggleDone(0)}
-      />
+      {
+        items.map((item, index) => <GroceryListItem
+          name={item.name}
+          category={item.category}
+          done={item.done}
+          toggleDone={makeToggleDone(index)}
+          deleteSelf={makeDeleteSelf(index)}
+        />)
+      }
     </List>
   );
 }
