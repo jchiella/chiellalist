@@ -1,11 +1,28 @@
 import React from 'react';
 import { useState } from 'react';
 
+import { makeStyles } from '@material-ui/core/styles';
+
 import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import Add from '@material-ui/icons/Add';
 
+const useStyles = makeStyles({
+  form: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '50%',
+    margin: 'auto',
+  }
+});
+
 export default function NewItemForm({ addItem }) {
+  const classes = useStyles();
+
   let nameField = null;
   const [itemName, setItemName] = useState('');
   const [itemCategory, setItemCategory] = useState('');
@@ -13,7 +30,6 @@ export default function NewItemForm({ addItem }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setItemName('');
-    setItemCategory('');
     nameField.focus();
     addItem({
       name: itemName,
@@ -23,7 +39,7 @@ export default function NewItemForm({ addItem }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className={classes.form}>
       <TextField
         label="Item"
         variant="outlined"
@@ -33,12 +49,15 @@ export default function NewItemForm({ addItem }) {
           ref: (textfield) => { nameField = textfield; },
         }}
       />
-      <TextField
-        label="Category"
-        variant="outlined"
-        value={itemCategory}
-        onChange={(e) => setItemCategory(e.target.value)}
-      />
+      
+      <FormControl style={{ minWidth: '10rem' }}>
+        <InputLabel>Category</InputLabel>
+        <Select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
+          <MenuItem value="Groceries">Groceries</MenuItem>
+          <MenuItem value="Produce">Produce</MenuItem>
+        </Select>
+      </FormControl>
+      
       <Button
         type="submit"
         variant="contained"
