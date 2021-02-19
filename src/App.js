@@ -8,7 +8,7 @@ import GroceryList from './GroceryList';
 export default function App() {
   return (
     <Container>
-      <Typography variant="h1">
+      <Typography variant="h2" style={{ textAlign: 'center' }}>
         ChiellaList
       </Typography>
 

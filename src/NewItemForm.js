@@ -14,9 +14,13 @@ import Add from '@material-ui/icons/Add';
 const useStyles = makeStyles({
   form: {
     display: 'flex',
-    justifyContent: 'space-between',
-    width: '50%',
+    justifyContent: 'space-around',
+    width: '70%',
     margin: 'auto',
+    flexWrap: 'wrap',
+  },
+  formCtrl: {
+    margin: '0.5rem',
   }
 });
 
@@ -41,6 +45,7 @@ export default function NewItemForm({ addItem }) {
   return (
     <form onSubmit={handleSubmit} className={classes.form}>
       <TextField
+        className={classes.formCtrl}
         label="Item"
         variant="outlined"
         value={itemName}
@@ -52,13 +57,14 @@ export default function NewItemForm({ addItem }) {
       
       <FormControl style={{ minWidth: '10rem' }}>
         <InputLabel>Category</InputLabel>
-        <Select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
+        <Select className={classes.formCtrl} value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
           <MenuItem value="Groceries">Groceries</MenuItem>
           <MenuItem value="Produce">Produce</MenuItem>
         </Select>
       </FormControl>
       
       <Button
+        className={classes.formCtrl}
         type="submit"
         variant="contained"
         color="primary"
