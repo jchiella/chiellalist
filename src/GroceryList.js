@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import List from '@material-ui/core/List';
 
@@ -7,13 +7,13 @@ import GroceryListItem from './GroceryListItem';
 import NewItemForm from './NewItemForm';
 
 export default function GroceryList() {
-  const [items, setItems] = useState([
-    {
-      name: 'Apples',
-      category: 'Produce',
-      done: false,
-    },
-  ]);
+  const [items, setItems] = useState();
+
+  useEffect(() => {
+    fetch('http://localhost:3003/item')
+      .then((res) => res.json())
+      .then((items) => setItems(items));
+  }, [items]);
 
   const makeToggleDone = (index) => {
     return (e) => {
@@ -26,18 +26,34 @@ export default function GroceryList() {
     return (e) => {
       e.preventDefault();
       setItems(items.filter((item, i) => i !== index));
+      fetch('http://localhost:3003/item', {
+        method: 'delete',
+        body: JSON.stringify(items[index]),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
     };
   }
 
   const addItem = (item) => {
     setItems([...items, item]);
+    fetch('http://localhost:3003/item', {
+      method: 'put',
+      body: JSON.stringify(item),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
   };
 
   return (<>
     <NewItemForm addItem={addItem} />
     <List>
       {
-        items.map((item, index) => <GroceryListItem
+        items && items.map((item, index) => <GroceryListItem
           key={index}
           name={item.name}
           category={item.category}
