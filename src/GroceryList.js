@@ -14,7 +14,7 @@ export default function GroceryList() {
   const socket = useRef(null);
 
   useEffect(() => {
-    socket.current = io('http://155.138.159.107:3003');
+    socket.current = io('https://valinor.tk:3003');
     socket.current.emit('hello');
 
     socket.current.on('update', (arg) => {
