@@ -25,7 +25,11 @@ export default function GroceryList() {
   const makeToggleDone = (index) => {
     return (e) => {
       e.preventDefault();
-      setItems(items.map((item, i) => i === index ? { name: item.name, category: item.category, done: !item.done }: item ));
+      socket.current.emit('patch', {
+        name: items[index].name,
+        category: items[index].category,
+        done: !items[index].done
+      });
     };
   }
 
