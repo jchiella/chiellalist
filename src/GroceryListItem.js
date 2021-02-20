@@ -13,21 +13,29 @@ const useStyles = makeStyles({
   done: {
     textDecoration: 'line-through',
   },
+  needed: {
+    fontWeight: 'bolder',
+  },
 });
 
 export default function GroceryListItem({
   name,
-  category,
   done,
-  toggleDone,
+  needed,
+  toggleDoneOrNeeded,
   deleteSelf,
+  shopMode,
 }) {
   const classes = useStyles();
 
   return (
-    <ListItem button onClick={toggleDone}>
-      <Checkbox checked={done} />
-      <ListItemText primary={name} className={done ? classes.done : ''} />
+    <ListItem button onClick={toggleDoneOrNeeded}>
+      {
+        shopMode ? <Checkbox checked={done} /> : <Checkbox color="primary" checked={needed} />
+      }
+      <ListItemText primary={name} classes={{
+        primary: `${done && shopMode ? classes.done : ''} ${needed && !shopMode ? classes.needed : ''}`
+      }} />
       <ListItemSecondaryAction>
         <IconButton onClick={deleteSelf}>
           <Delete />

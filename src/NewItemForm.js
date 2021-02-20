@@ -40,6 +40,7 @@ export default function NewItemForm({ addItem, items, categories }) {
         name: itemName,
         category: itemCategory,
         done: false,
+        needed: false,
       });
     }
   };

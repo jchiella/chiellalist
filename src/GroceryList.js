@@ -8,6 +8,7 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 
 import GroceryListItem from './GroceryListItem';
 import NewItemForm from './NewItemForm';
+import ModeSwitch from './ModeSwitch';
 
 import { io } from 'socket.io-client';
 
@@ -22,6 +23,7 @@ export default function GroceryList() {
   const classes = useStyles();
 
   const [items, setItems] = useState([]);
+  const [shopMode, setShopMode] = useState(false);
 
   const categories = [
     'Produce',
@@ -43,15 +45,26 @@ export default function GroceryList() {
     });
   }, []);
 
-  const makeToggleDone = (name) => {
+  const makeToggleDoneOrNeeded = (name) => {
     const index = items.findIndex((item) => item.name === name);
     return (e) => {
       e.preventDefault();
-      socket.current.emit('patch', {
-        name: items[index].name,
-        category: items[index].category,
-        done: !items[index].done
-      });
+      if (shopMode) {
+        socket.current.emit('patch', {
+          name: items[index].name,
+          category: items[index].category,
+          done: !items[index].done,
+          needed: items[index].needed,
+        });
+      } else {
+        socket.current.emit('patch', {
+          name: items[index].name,
+          category: items[index].category,
+          done: items[index].done,
+          needed: !items[index].needed,
+        });
+      }
+      
     };
   }
 
@@ -67,12 +80,22 @@ export default function GroceryList() {
     socket.current.emit('put', item);
   };
 
+  const handleModeChange = (e) => {
+    setShopMode(e.target.checked);
+  };
+
   return (<>
     <NewItemForm addItem={addItem} items={items} categories={categories} />
+    <ModeSwitch shopMode={shopMode} handleModeChange={handleModeChange} />
     <List>
       {
         categories.map((cat, i) => {
-          const filteredItems = items.filter((item) => item.category === cat);
+          let filteredItems;
+          if (shopMode) {
+            filteredItems = items.filter((item) => item.category === cat && item.needed);
+          } else {
+            filteredItems = items.filter((item) => item.category === cat);
+          }
           if (filteredItems.length) {
             return (
               <div key={i}>
@@ -83,8 +106,10 @@ export default function GroceryList() {
                     name={item.name}
                     category={item.category}
                     done={item.done}
-                    toggleDone={makeToggleDone(item.name)}
+                    needed={item.needed}
+                    toggleDoneOrNeeded={makeToggleDoneOrNeeded(item.name)}
                     deleteSelf={makeDeleteSelf(item.name)}
+                    shopMode={shopMode}
                   />)
                 }
               </div>
