@@ -1,19 +1,26 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import List from '@material-ui/core/List';
 
 import GroceryListItem from './GroceryListItem';
 import NewItemForm from './NewItemForm';
 
+import { io } from 'socket.io-client';
+
 export default function GroceryList() {
   const [items, setItems] = useState();
 
+  const socket = useRef(null);
+
   useEffect(() => {
-    fetch('http://localhost:3003/item')
-      .then((res) => res.json())
-      .then((items) => setItems(items));
-  }, [items]);
+    socket.current = io('http://localhost:3003');
+    socket.current.emit('hello');
+
+    socket.current.on('update', (arg) => {
+      setItems(arg);
+    });
+  }, []);
 
   const makeToggleDone = (index) => {
     return (e) => {
@@ -25,28 +32,12 @@ export default function GroceryList() {
   const makeDeleteSelf = (index) => {
     return (e) => {
       e.preventDefault();
-      setItems(items.filter((item, i) => i !== index));
-      fetch('http://localhost:3003/item', {
-        method: 'delete',
-        body: JSON.stringify(items[index]),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
+      socket.current.emit('delete', items[index]);
     };
   }
 
   const addItem = (item) => {
-    setItems([...items, item]);
-    fetch('http://localhost:3003/item', {
-      method: 'put',
-      body: JSON.stringify(item),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
+    socket.current.emit('put', item);
   };
 
   return (<>
