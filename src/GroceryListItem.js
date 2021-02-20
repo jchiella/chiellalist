@@ -17,7 +17,7 @@ export default function GroceryListItem({
   return (
     <ListItem button onClick={toggleDone}>
       <Checkbox checked={done} />
-      <ListItemText primary={name} secondary={category} />
+      <ListItemText primary={name} />
       <ListItemSecondaryAction>
         <IconButton onClick={deleteSelf}>
           <Delete />

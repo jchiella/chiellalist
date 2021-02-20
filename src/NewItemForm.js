@@ -24,7 +24,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function NewItemForm({ addItem }) {
+export default function NewItemForm({ addItem, items, categories }) {
   const classes = useStyles();
 
   let nameField = null;
@@ -35,11 +35,13 @@ export default function NewItemForm({ addItem }) {
     e.preventDefault();
     setItemName('');
     nameField.focus();
-    addItem({
-      name: itemName,
-      category: itemCategory,
-      done: false,
-    });
+    if (!items.map((item) => item.name).includes(itemName)) {
+      addItem({
+        name: itemName,
+        category: itemCategory,
+        done: false,
+      });
+    }
   };
 
   return (
@@ -58,8 +60,9 @@ export default function NewItemForm({ addItem }) {
       <FormControl style={{ minWidth: '10rem' }}>
         <InputLabel>Category</InputLabel>
         <Select className={classes.formCtrl} value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
-          <MenuItem value="Groceries">Groceries</MenuItem>
-          <MenuItem value="Produce">Produce</MenuItem>
+          {
+            categories.map((cat, i) => <MenuItem key={i} value={cat}>{cat}</MenuItem>)
+          }
         </Select>
       </FormControl>
       

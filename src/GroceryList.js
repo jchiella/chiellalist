@@ -1,15 +1,36 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 
+import { makeStyles } from '@material-ui/core/styles';
+
 import List from '@material-ui/core/List';
+import ListSubheader from '@material-ui/core/ListSubheader';
 
 import GroceryListItem from './GroceryListItem';
 import NewItemForm from './NewItemForm';
 
 import { io } from 'socket.io-client';
 
+const useStyles = makeStyles({
+  subheading: {
+    fontSize: 'x-large',
+    color: 'black',
+  },
+});
+
 export default function GroceryList() {
-  const [items, setItems] = useState();
+  const classes = useStyles();
+
+  const [items, setItems] = useState([]);
+
+  const categories = [
+    'Produce',
+    'Meat & Deli',
+    'Cleaning Products',
+    'Dairy',
+    'Bakery',
+    'Personal Care',
+  ];
 
   const socket = useRef(null);
 
@@ -22,7 +43,9 @@ export default function GroceryList() {
     });
   }, []);
 
-  const makeToggleDone = (index) => {
+  const makeToggleDone = (name) => {
+    const index = items.findIndex((item) => item.name === name);
+    console.log(index);
     return (e) => {
       e.preventDefault();
       socket.current.emit('patch', {
@@ -33,7 +56,8 @@ export default function GroceryList() {
     };
   }
 
-  const makeDeleteSelf = (index) => {
+  const makeDeleteSelf = (name) => {
+    const index = items.findIndex((item) => item.name === name);
     return (e) => {
       e.preventDefault();
       socket.current.emit('delete', items[index]);
@@ -45,17 +69,26 @@ export default function GroceryList() {
   };
 
   return (<>
-    <NewItemForm addItem={addItem} />
+    <NewItemForm addItem={addItem} items={items} categories={categories} />
     <List>
       {
-        items && items.map((item, index) => <GroceryListItem
-          key={index}
-          name={item.name}
-          category={item.category}
-          done={item.done}
-          toggleDone={makeToggleDone(index)}
-          deleteSelf={makeDeleteSelf(index)}
-        />)
+        categories.map((cat, i) => {
+          return (
+            <div key={i}>
+              <ListSubheader className={classes.subheading}>{cat}</ListSubheader>
+              {
+                items && items.filter((item) => item.category === cat).map((item, index) => <GroceryListItem
+                  key={index}
+                  name={item.name}
+                  category={item.category}
+                  done={item.done}
+                  toggleDone={makeToggleDone(item.name)}
+                  deleteSelf={makeDeleteSelf(item.name)}
+                />)
+              }
+            </div>
+          );
+        })
       }
     </List>
   </>);
