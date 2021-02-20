@@ -45,7 +45,6 @@ export default function GroceryList() {
 
   const makeToggleDone = (name) => {
     const index = items.findIndex((item) => item.name === name);
-    console.log(index);
     return (e) => {
       e.preventDefault();
       socket.current.emit('patch', {
@@ -73,21 +72,25 @@ export default function GroceryList() {
     <List>
       {
         categories.map((cat, i) => {
-          return (
-            <div key={i}>
-              <ListSubheader className={classes.subheading}>{cat}</ListSubheader>
-              {
-                items && items.filter((item) => item.category === cat).map((item, index) => <GroceryListItem
-                  key={index}
-                  name={item.name}
-                  category={item.category}
-                  done={item.done}
-                  toggleDone={makeToggleDone(item.name)}
-                  deleteSelf={makeDeleteSelf(item.name)}
-                />)
-              }
-            </div>
-          );
+          const filteredItems = items.filter((item) => item.category === cat);
+          if (filteredItems.length) {
+            return (
+              <div key={i}>
+                <ListSubheader className={classes.subheading}>{cat}</ListSubheader>
+                {
+                  items && filteredItems.map((item, index) => <GroceryListItem
+                    key={index}
+                    name={item.name}
+                    category={item.category}
+                    done={item.done}
+                    toggleDone={makeToggleDone(item.name)}
+                    deleteSelf={makeDeleteSelf(item.name)}
+                  />)
+                }
+              </div>
+            );
+          }
+          return undefined;
         })
       }
     </List>
