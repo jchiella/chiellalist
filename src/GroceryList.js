@@ -27,11 +27,12 @@ export default function GroceryList() {
 
   const categories = [
     'Produce',
-    'Meat & Deli',
-    'Cleaning Products',
     'Dairy',
-    'Bakery',
+    'Groceries',
     'Personal Care',
+    'Cleaning Products',
+    'Meat & Deli',
+    'Bakery',
   ];
 
   const socket = useRef(null);
