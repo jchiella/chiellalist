@@ -120,7 +120,8 @@ export default function GroceryList() {
                   {cat}<ArrowDropDown />
                 </ListSubheader>
                 {
-                  items && shownCategories.includes(cat) && filteredItems.map((item, index) => <GroceryListItem
+                  items && shownCategories.includes(cat) && 
+                  filteredItems.sort((a, b) => a.name.localeCompare(b.name)).map((item, index) => <GroceryListItem
                     key={index}
                     name={item.name}
                     category={item.category}
