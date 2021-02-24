@@ -5,6 +5,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
+import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
+
 
 import GroceryListItem from './GroceryListItem';
 import NewItemForm from './NewItemForm';
@@ -16,6 +18,7 @@ const useStyles = makeStyles({
   subheading: {
     fontSize: 'x-large',
     color: 'black',
+    cursor: 'pointer',
   },
 });
 
@@ -34,6 +37,8 @@ export default function GroceryList() {
     'Meat & Deli',
     'Bakery',
   ];
+
+  const [shownCategories, setShownCategories] = useState(categories);
 
   const socket = useRef(null);
 
@@ -65,7 +70,7 @@ export default function GroceryList() {
           needed: !items[index].needed,
         });
       }
-      
+
     };
   }
 
@@ -75,7 +80,18 @@ export default function GroceryList() {
       e.preventDefault();
       socket.current.emit('delete', items[index]);
     };
-  }
+  };
+
+  const makeToggleCategory = (category) => {
+    return (e) => {
+      e.preventDefault();
+      if (shownCategories.includes(category)) {
+        setShownCategories(shownCategories.filter((cat) => cat !== category));
+      } else {
+        setShownCategories([...shownCategories, category]);
+      }
+    };
+  };
 
   const addItem = (item) => {
     socket.current.emit('put', item);
@@ -100,9 +116,11 @@ export default function GroceryList() {
           if (filteredItems.length) {
             return (
               <div key={i}>
-                <ListSubheader className={classes.subheading}>{cat}</ListSubheader>
+                <ListSubheader className={classes.subheading} onClick={makeToggleCategory(cat)}>
+                  {cat}<ArrowDropDown />
+                </ListSubheader>
                 {
-                  items && filteredItems.map((item, index) => <GroceryListItem
+                  items && shownCategories.includes(cat) && filteredItems.map((item, index) => <GroceryListItem
                     key={index}
                     name={item.name}
                     category={item.category}
