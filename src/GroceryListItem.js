@@ -36,11 +36,13 @@ export default function GroceryListItem({
       <ListItemText primary={name} classes={{
         primary: `${done && shopMode ? classes.done : ''} ${needed && !shopMode ? classes.needed : ''}`
       }} />
-      <ListItemSecondaryAction>
-        <IconButton onClick={deleteSelf}>
-          <Delete />
-        </IconButton>
-      </ListItemSecondaryAction>
+      {
+        !shopMode && <ListItemSecondaryAction>
+          <IconButton onClick={deleteSelf}>
+            <Delete />
+          </IconButton>
+        </ListItemSecondaryAction>
+      }
     </ListItem>
   );
 }
