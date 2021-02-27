@@ -13,6 +13,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import GroceryListItem from './GroceryListItem';
 import NewItemForm from './NewItemForm';
 import ModeSwitch from './ModeSwitch';
+import FontSizeSelector from './FontSizeSelector';
 
 import { io } from 'socket.io-client';
 import { ListItemText } from '@material-ui/core';
@@ -45,6 +46,10 @@ export default function GroceryList() {
 
   const [allDone, setAllDone] = useState(false);
   const [allNeeded, setAllNeeded] = useState(false);
+
+  const [fontSize, setFontSize] = useState(0);
+
+  const fontSizes = ['body1', 'h5', 'h4'];
 
   const socket = useRef(null);
 
@@ -109,12 +114,13 @@ export default function GroceryList() {
   return (<>
     <NewItemForm addItem={addItem} items={items} categories={categories} />
     <ModeSwitch shopMode={shopMode} handleModeChange={handleModeChange} />
+    <FontSizeSelector fontSize={fontSize} setFontSize={setFontSize} />
     <List>
       <ListItem button onClick={toggleAll}>
         {
           shopMode ? <Checkbox checked={allDone} /> : <Checkbox color="primary" checked={allNeeded} />
         }
-        <ListItemText>
+        <ListItemText  primaryTypographyProps={{ variant: fontSizes[fontSize] }} >
           <strong>Select All</strong>
         </ListItemText>
       </ListItem>
@@ -143,6 +149,8 @@ export default function GroceryList() {
                     toggleDoneOrNeeded={makeToggleDoneOrNeeded(item.name)}
                     deleteSelf={makeDeleteSelf(item.name)}
                     shopMode={shopMode}
+                    fontSize={fontSize}
+                    fontSizes={fontSizes}
                   />)
                 }
               </div>

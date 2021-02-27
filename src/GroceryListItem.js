@@ -25,6 +25,8 @@ export default function GroceryListItem({
   toggleDoneOrNeeded,
   deleteSelf,
   shopMode,
+  fontSize,
+  fontSizes
 }) {
   const classes = useStyles();
 
@@ -34,8 +36,8 @@ export default function GroceryListItem({
         shopMode ? <Checkbox checked={done} /> : <Checkbox color="primary" checked={needed} />
       }
       <ListItemText primary={name} classes={{
-        primary: `${done && shopMode ? classes.done : ''} ${needed && !shopMode ? classes.needed : ''}`
-      }} />
+        primary: `${done && shopMode ? classes.done : ''} ${needed && !shopMode ? classes.needed : ''}`,
+      }} primaryTypographyProps={{ variant: fontSizes[fontSize] }} />
       {
         !shopMode && <ListItemSecondaryAction>
           <IconButton onClick={deleteSelf}>
