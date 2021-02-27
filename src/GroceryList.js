@@ -5,7 +5,9 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
+import ListItem from '@material-ui/core/ListItem';
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
+import Checkbox from '@material-ui/core/Checkbox';
 
 
 import GroceryListItem from './GroceryListItem';
@@ -13,6 +15,7 @@ import NewItemForm from './NewItemForm';
 import ModeSwitch from './ModeSwitch';
 
 import { io } from 'socket.io-client';
+import { ListItemText } from '@material-ui/core';
 
 const useStyles = makeStyles({
   subheading: {
@@ -40,6 +43,9 @@ export default function GroceryList() {
 
   const [shownCategories, setShownCategories] = useState(categories);
 
+  const [allDone, setAllDone] = useState(false);
+  const [allNeeded, setAllNeeded] = useState(false);
+
   const socket = useRef(null);
 
   useEffect(() => {
@@ -56,21 +62,10 @@ export default function GroceryList() {
     return (e) => {
       e.preventDefault();
       if (shopMode) {
-        socket.current.emit('patch', {
-          name: items[index].name,
-          category: items[index].category,
-          done: !items[index].done,
-          needed: items[index].needed,
-        });
+        socket.current.emit('patch', name, { done: !items[index].done });
       } else {
-        socket.current.emit('patch', {
-          name: items[index].name,
-          category: items[index].category,
-          done: items[index].done,
-          needed: !items[index].needed,
-        });
+        socket.current.emit('patch', name, { needed: !items[index].needed });
       }
-
     };
   }
 
@@ -101,10 +96,28 @@ export default function GroceryList() {
     setShopMode(e.target.checked);
   };
 
+  const toggleAll = (e) => {
+    if (shopMode) {
+      socket.current.emit('patchAll', { done: !allDone });
+      setAllDone(!allDone);
+    } else {
+      socket.current.emit('patchAll', { needed : !allNeeded });
+      setAllNeeded(!allNeeded);
+    }
+  };
+
   return (<>
     <NewItemForm addItem={addItem} items={items} categories={categories} />
     <ModeSwitch shopMode={shopMode} handleModeChange={handleModeChange} />
     <List>
+      <ListItem button onClick={toggleAll}>
+        {
+          shopMode ? <Checkbox checked={allDone} /> : <Checkbox color="primary" checked={allNeeded} />
+        }
+        <ListItemText>
+          <strong>Select All</strong>
+        </ListItemText>
+      </ListItem>
       {
         categories.map((cat, i) => {
           let filteredItems;
