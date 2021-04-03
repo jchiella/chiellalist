@@ -9,7 +9,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
 import Checkbox from '@material-ui/core/Checkbox';
 
-
 import GroceryListItem from './GroceryListItem';
 import NewItemForm from './NewItemForm';
 import ModeSwitch from './ModeSwitch';
@@ -54,7 +53,7 @@ export default function GroceryList() {
   const socket = useRef(null);
 
   useEffect(() => {
-    socket.current = io('https://valinor.tk:3003');
+    socket.current = io('https://chiellalist.vlnr.tech');
     socket.current.emit('hello');
 
     socket.current.on('update', (arg) => {
@@ -72,7 +71,7 @@ export default function GroceryList() {
         socket.current.emit('patch', name, { needed: !items[index].needed });
       }
     };
-  }
+  };
 
   const makeDeleteSelf = (name) => {
     const index = items.findIndex((item) => item.name === name);
@@ -106,59 +105,72 @@ export default function GroceryList() {
       socket.current.emit('patchAll', { done: !allDone });
       setAllDone(!allDone);
     } else {
-      socket.current.emit('patchAll', { needed : !allNeeded });
+      socket.current.emit('patchAll', { needed: !allNeeded });
       setAllNeeded(!allNeeded);
     }
   };
 
-  return (<>
-    <NewItemForm addItem={addItem} items={items} categories={categories} />
-    <ModeSwitch shopMode={shopMode} handleModeChange={handleModeChange} />
-    <FontSizeSelector fontSize={fontSize} setFontSize={setFontSize} />
-    <List>
-      <ListItem button onClick={toggleAll}>
-        {
-          shopMode ? <Checkbox checked={allDone} /> : <Checkbox color="primary" checked={allNeeded} />
-        }
-        <ListItemText  primaryTypographyProps={{ variant: fontSizes[fontSize] }} >
-          <strong>Select All</strong>
-        </ListItemText>
-      </ListItem>
-      {
-        categories.map((cat, i) => {
+  return (
+    <>
+      <NewItemForm addItem={addItem} items={items} categories={categories} />
+      <ModeSwitch shopMode={shopMode} handleModeChange={handleModeChange} />
+      <FontSizeSelector fontSize={fontSize} setFontSize={setFontSize} />
+      <List>
+        <ListItem button onClick={toggleAll}>
+          {shopMode ? (
+            <Checkbox checked={allDone} />
+          ) : (
+            <Checkbox color="primary" checked={allNeeded} />
+          )}
+          <ListItemText
+            primaryTypographyProps={{ variant: fontSizes[fontSize] }}
+          >
+            <strong>Select All</strong>
+          </ListItemText>
+        </ListItem>
+        {categories.map((cat, i) => {
           let filteredItems;
           if (shopMode) {
-            filteredItems = items.filter((item) => item.category === cat && item.needed);
+            filteredItems = items.filter(
+              (item) => item.category === cat && item.needed
+            );
           } else {
             filteredItems = items.filter((item) => item.category === cat);
           }
           if (filteredItems.length) {
             return (
               <div key={i}>
-                <ListSubheader className={classes.subheading} onClick={makeToggleCategory(cat)}>
-                  {cat}<ArrowDropDown />
+                <ListSubheader
+                  className={classes.subheading}
+                  onClick={makeToggleCategory(cat)}
+                >
+                  {cat}
+                  <ArrowDropDown />
                 </ListSubheader>
-                {
-                  items && shownCategories.includes(cat) && 
-                  filteredItems.sort((a, b) => a.name.localeCompare(b.name)).map((item, index) => <GroceryListItem
-                    key={index}
-                    name={item.name}
-                    category={item.category}
-                    done={item.done}
-                    needed={item.needed}
-                    toggleDoneOrNeeded={makeToggleDoneOrNeeded(item.name)}
-                    deleteSelf={makeDeleteSelf(item.name)}
-                    shopMode={shopMode}
-                    fontSize={fontSize}
-                    fontSizes={fontSizes}
-                  />)
-                }
+                {items &&
+                  shownCategories.includes(cat) &&
+                  filteredItems
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((item, index) => (
+                      <GroceryListItem
+                        key={index}
+                        name={item.name}
+                        category={item.category}
+                        done={item.done}
+                        needed={item.needed}
+                        toggleDoneOrNeeded={makeToggleDoneOrNeeded(item.name)}
+                        deleteSelf={makeDeleteSelf(item.name)}
+                        shopMode={shopMode}
+                        fontSize={fontSize}
+                        fontSizes={fontSizes}
+                      />
+                    ))}
               </div>
             );
           }
           return undefined;
-        })
-      }
-    </List>
-  </>);
+        })}
+      </List>
+    </>
+  );
 }
